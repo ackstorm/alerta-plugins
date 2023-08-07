@@ -6,7 +6,7 @@ setup(
     name="alerta-prometheus-parser",
     version=version,
     description='Alerta plugin for ackstorm',
-    url='https://github.com/alerta/alerta-contrib',
+    url='https://github.com/ackstorm/alerta-plugins',
     license='Apache License 2.0',
     author='Juan Carlos Moreno',
     author_email='juancarlos.moreno@',
@@ -19,7 +19,7 @@ setup(
     zip_safe=True,
     entry_points={
         'alerta.plugins': [
-            'ackstorm = prometheus_parser:PrometheusParser'
+            'promparser = prometheus_parser:PrometheusParser'
         ]
     }
 )
