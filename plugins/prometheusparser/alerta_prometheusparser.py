@@ -1,6 +1,7 @@
 import os
 import logging
 
+from flask import current_app
 from alerta.plugins import PluginBase
 
 LOG = logging.getLogger('alerta.plugins.ackstorm')
