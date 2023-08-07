@@ -6,6 +6,13 @@ from alerta.plugins import PluginBase
 
 LOG = logging.getLogger('alerta.plugins.ackstorm')
 TAGS_TO_ATTRIBUTES = ['timeperiod', 'env', 'cluster', 'tenant_id']
+WARNING_ALERTS=[
+    "KubeCPUOvercommit",
+    "KubernetesVolumeFullInFourDays",
+    "ThanosQueryGrpcClientErrorRate",
+    "NodeNetworkInterfaceFlapping",
+    "KubeAggregatedAPIErrors"
+    ]
 
 
 class MimirAlert(PluginBase):
@@ -42,7 +49,7 @@ class MimirAlert(PluginBase):
         alert.severity = 'info'     if alert.severity in ['minor'] else alert.severity
 
         # Noise reduction
-        if alert.event in ["KubeCPUOvercommit", "KubernetesVolumeFullInFourDays", "ThanosQueryGrpcClientErrorRate"]:
+        if alert.event in WARNING_ALERTS:
             alert.severity = 'warning'
 
         # Hardcoded timeouts (10m for watchdog or 380 for alerts)
@@ -54,6 +61,7 @@ class MimirAlert(PluginBase):
         # Set environment and timeperiod
         alert.environment = _tags.get('env', current_app.config['DEFAULT_ENVIRONMENT'])
         alert.environment = 'prod' if alert.environment in ['pro', 'prd'] else alert.environment # fix 3char envs
+        alert.attributes['timeperiod'] = '24x7' if alert.environment == 'prod' else '8x5'
 
         # Set base propperties
         alert.origin = 'prometheus/' + _tags['tenant_id']
