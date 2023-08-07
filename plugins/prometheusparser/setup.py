@@ -3,15 +3,15 @@ from setuptools import setup, find_packages
 version = '0.0.1'
 
 setup(
-    name="alerta-prometheus-parser",
+    name="alerta-prometheusparser",
     version=version,
-    description='Alerta plugin for ackstorm',
+    description='Alerta plugin to parser prometheus alerts',
     url='https://github.com/ackstorm/alerta-plugins',
     license='Apache License 2.0',
     author='Juan Carlos Moreno',
     author_email='juancarlos.moreno@',
     packages=find_packages(),
-    py_modules=['prometheus_parser'],
+    py_modules=['alerta_prometheusparser'],
     install_requires=[
         "requests",
     ],
@@ -19,7 +19,7 @@ setup(
     zip_safe=True,
     entry_points={
         'alerta.plugins': [
-            'promparser = prometheus_parser:PrometheusParser'
+            'prometheusparser = alerta_prometheusparser:PrometheusParser'
         ]
     }
 )
