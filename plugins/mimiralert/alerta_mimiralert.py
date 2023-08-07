@@ -26,7 +26,9 @@ class MimirAlert(PluginBase):
 
         # Exclude non multi-tenant events (not comming from mimir)
         if not _tags.get('tenant_id'):
-            return alert             
+            return alert    
+
+        LOG.info("Processing mimir alert: %s", alert.id)         
 
         # ACKSTORM: Custom severity
         # Change severity for prometheus alerts, as defined in prometheus severity guidelines:
@@ -51,7 +53,7 @@ class MimirAlert(PluginBase):
 
         # Set environment and timeperiod
         alert.environment = _tags.get('env', current_app.config['DEFAULT_ENVIRONMENT'])
-        alert.environment = 'prod' if alert.environment in ['pro', 'prd'] else alert.environment
+        alert.environment = 'prod' if alert.environment in ['pro', 'prd'] else alert.environment # fix 3char envs
 
         # Set base propperties
         alert.origin = 'prometheus/' + _tags['tenant_id']
@@ -82,7 +84,6 @@ class MimirAlert(PluginBase):
 
     def pre_receive(self, alert, **kwargs):
         if alert.event_type == "prometheusAlert":
-            LOG.info("Adapting prometheus webhook: %s", alert.id)
             alert = self._parse_alert(alert)
         
         return alert
