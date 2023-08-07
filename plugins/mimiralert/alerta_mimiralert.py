@@ -56,7 +56,8 @@ class MimirAlert(PluginBase):
         alert.timeout = 600 if alert.event == 'Watchdog' else 380 # repeat_interval: 2m configured in alertmanager
 
         # Always define a service
-        alert.service = [_tags.get('namespace')] if _tags.get('namespace') else ['global']
+        if not alert.service:
+            alert.service = [_tags.get('namespace')] if _tags.get('namespace') else ['global']
 
         # Set environment and timeperiod
         alert.environment = _tags.get('env', current_app.config['DEFAULT_ENVIRONMENT'])
@@ -71,7 +72,7 @@ class MimirAlert(PluginBase):
         alert.resource = '{}/{}/{}/{}'.format(
             alert.environment,
             alert.origin,
-            _tags.get('namespace') if _tags.get('namespace') else 'global',
+            alert.service[0],
             alert.event,
         )
 
