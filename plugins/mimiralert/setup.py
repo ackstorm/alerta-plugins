@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 version = '0.0.1'
 
 setup(
-    name="alerta-prometheusparser",
+    name="alerta-mimiralert",
     version=version,
     description='Alerta plugin to parser prometheus alerts',
     url='https://github.com/ackstorm/alerta-plugins',
@@ -11,7 +11,7 @@ setup(
     author='Juan Carlos Moreno',
     author_email='juancarlos.moreno@',
     packages=find_packages(),
-    py_modules=['alerta_prometheusparser'],
+    py_modules=['alerta_mimiralert'],
     install_requires=[
         "requests",
     ],
@@ -19,7 +19,7 @@ setup(
     zip_safe=True,
     entry_points={
         'alerta.plugins': [
-            'prometheusparser = alerta_prometheusparser:PrometheusParser'
+            'mimiralert = alerta_mimiralert:MimirAlert'
         ]
     }
 )

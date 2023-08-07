@@ -8,11 +8,11 @@ LOG = logging.getLogger('alerta.plugins.ackstorm')
 TAGS_TO_ATTRIBUTES = ['timeperiod', 'env', 'cluster', 'tenant_id']
 
 
-class PrometheusParser(PluginBase):
+class MimirAlert(PluginBase):
     def __init__(self, name=None):
         super().__init__(name)
 
-    def _parse_prometheus(self, alert):
+    def _parse_alert(self, alert):
         # Tags to attributes and build _tags
         _tags = {}
         for item in alert.tags:
@@ -24,7 +24,7 @@ class PrometheusParser(PluginBase):
             except ValueError:
                 pass
 
-        # Exclude non multi-tenant events
+        # Exclude non multi-tenant events (not comming from mimir)
         if not _tags.get('tenant_id'):
             return alert             
 
@@ -82,8 +82,8 @@ class PrometheusParser(PluginBase):
 
     def pre_receive(self, alert, **kwargs):
         if alert.event_type == "prometheusAlert":
-            LOG.info("Adapting prometheus webhook: %s %s", alert.id, alert.resource)
-            alert = self._parse_prometheus(alert)
+            LOG.info("Adapting prometheus webhook: %s", alert.id)
+            alert = self._parse_alert(alert)
         
         return alert
 
