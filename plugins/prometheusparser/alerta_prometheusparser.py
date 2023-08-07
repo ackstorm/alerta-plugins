@@ -11,7 +11,7 @@ class PrometheusParser(PluginBase):
     def __init__(self, name=None):
         super().__init__(name)
 
-    def _parse_prometheus(alert):
+    def _parse_prometheus(self, alert):
         # Tags to attributes and build _tags
         _tags = {}
         for item in alert.tags:
