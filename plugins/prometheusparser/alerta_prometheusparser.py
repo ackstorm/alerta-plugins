@@ -45,9 +45,12 @@ class PrometheusParser(PluginBase):
         # Hardcoded timeouts (10m for watchdog or 380 for alerts)
         alert.timeout = 600 if alert.event == 'Watchdog' else 380 # repeat_interval: 2m configured in alertmanager
 
+        # Always define a service
+        alert.service = _tags.get('namespace') if _tags.get('namespace') else 'global'
+
         # Set environment and timeperiod
-        alert.environment = 'prod' if alert.attributes.get('env') in ['pro', 'prd'] else alert.environment
-        alert.attributes['timeperiod'] = '24x7' if alert.environment == 'prod' else '8x5'
+        alert.environment = _tags.get('env', current_app.config['DEFAULT_ENVIRONMENT'])
+        alert.environment = 'prod' if alert.environment in ['pro', 'prd'] else alert.environment
 
         # Set base propperties
         alert.origin = 'prometheus/' + _tags['tenant_id']
