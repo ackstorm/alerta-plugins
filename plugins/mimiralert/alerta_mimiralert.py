@@ -56,7 +56,7 @@ class MimirAlert(PluginBase):
         alert.timeout = 600 if alert.event == 'Watchdog' else 380 # repeat_interval: 2m configured in alertmanager
 
         # Always define a service
-        if not alert.service:
+        if not alert.service or not alert.service[0]:
             alert.service = [_tags.get('namespace')] if _tags.get('namespace') else ['global']
         else:
             LOG.info("Service is: '%s'", alert.service)  
