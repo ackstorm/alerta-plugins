@@ -47,8 +47,6 @@ class MimirAlert(PluginBase):
         # Always define a service
         if not alert.service or not alert.service[0]:
             alert.service = [_tags.get('namespace')] if _tags.get('namespace') else ['global']
-        else:
-            LOG.info("Service is: '%s'", alert.service)  
 
         # Set environment and timeperiod
         alert.environment = _tags.get('env', current_app.config['DEFAULT_ENVIRONMENT'])
