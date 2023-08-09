@@ -37,17 +37,6 @@ class MimirAlert(PluginBase):
 
         LOG.info("Processing mimir alert: %s", alert.id)         
 
-        # ACKSTORM: Custom severity
-        # Change severity for prometheus alerts, as defined in prometheus severity guidelines:
-        # Critical: An issue, that needs to page a person to take instant action
-        # Warning: An issue, that needs to be worked on but in the regular work queue or for during office hours rather than paging the oncall
-        # Info: Is meant to support a trouble shooting process by informing about a non-normal situation for one or more systems but not worth a page or ticket on its own.
-
-        alert.severity = 'critical' if alert.severity in ['page', 'email'] else alert.severity
-        alert.severity = 'major'    if alert.severity in ['warning'] else alert.severity
-        alert.severity = 'warning'  if alert.severity in ['info'] else alert.severity
-        alert.severity = 'info'     if alert.severity in ['minor'] else alert.severity
-
         # Noise reduction
         if alert.event in WARNING_ALERTS:
             alert.severity = 'warning'
