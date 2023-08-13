@@ -6,13 +6,6 @@ from alerta.plugins import PluginBase
 
 LOG = logging.getLogger('alerta.plugins.ackstorm')
 TAGS_TO_ATTRIBUTES = ['timeperiod', 'env', 'cluster', 'tenant_id']
-WARNING_ALERTS=[
-    "KubeCPUOvercommit",
-    "KubernetesVolumeFullInFourDays",
-    "ThanosQueryGrpcClientErrorRate",
-    "NodeNetworkInterfaceFlapping",
-    "KubeAggregatedAPIErrors"
-    ]
 
 
 class MimirAlert(PluginBase):
@@ -37,12 +30,12 @@ class MimirAlert(PluginBase):
 
         LOG.info("Processing mimir alert: %s", alert.id)         
 
-        # Noise reduction
-        if alert.event in WARNING_ALERTS:
-            alert.severity = 'warning'
-
-        # Hardcoded timeouts (10m for watchdog or 380 for alerts)
-        alert.timeout = 600 if alert.event == 'Watchdog' else 380 # repeat_interval: 2m configured in alertmanager
+        # Hardcoded timeouts (11m for watchdog or 7m for alerts): repeat_interval: 2m configured in alertmanager
+        if alert.event == 'Watchdog':
+            alert.severity = 'critical'
+            alert.timeout = 600
+        else:
+            alert.timeout = 420 
 
         # Always define a service
         if not alert.service or not alert.service[0]:
@@ -83,7 +76,6 @@ class MimirAlert(PluginBase):
     def pre_receive(self, alert, **kwargs):
         if alert.event_type == "prometheusAlert":
             alert = self._parse_alert(alert)
-        
         return alert
 
     def post_receive(self, alert):
