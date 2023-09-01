@@ -3,8 +3,9 @@ import logging
 
 from flask import current_app
 from alerta.plugins import PluginBase
+from alerta.models.enums import Status
 
-LOG = logging.getLogger('alerta.plugins.ackstorm')
+LOG = logging.getLogger('alerta.plugins.mimiralert')
 TAGS_TO_ATTRIBUTES = ['timeperiod', 'env', 'cluster', 'tenant_id']
 
 
@@ -61,7 +62,7 @@ class MimirAlert(PluginBase):
         if alert.event == 'KubeHpaMaxedOut' and _tags.get('horizontalpodautoscaler'):
             alert.resource += '/{}'.format(_tags['horizontalpodautoscaler'])
 
-        elif _tags.get('container'):
+        elif _tags.get('container') and _tags.get('container') != "kube-rbac-proxy-main":
             alert.resource += '/{}'.format(_tags['container'])
 
         elif _tags.get('name'):
@@ -70,7 +71,10 @@ class MimirAlert(PluginBase):
         elif _tags.get('job'):
             alert.resource += '/{}'.format(_tags['job'])    
 
-        return alert  
+        elif _tags.get('deployment'):
+            alert.resource += '/{}'.format(_tags['deployment'])    
+
+        return alert
 
     def pre_receive(self, alert, **kwargs):
         if alert.event_type == "prometheusAlert":
