@@ -60,19 +60,22 @@ class MimirAlert(PluginBase):
 
         # Enhance resource
         if alert.event == 'KubeHpaMaxedOut' and _tags.get('horizontalpodautoscaler'):
-            alert.resource += '/{}'.format(_tags['horizontalpodautoscaler'])
+            alert.resource += '/hpa={}'.format(_tags['horizontalpodautoscaler'])
 
         elif _tags.get('container') and _tags.get('container') != "kube-rbac-proxy-main":
-            alert.resource += '/{}'.format(_tags['container'])
+            alert.resource += '/container={}'.format(_tags['container'])
+
+        elif _tags.get('app'):
+            alert.resource += '/app={}'.format(_tags['app'])
 
         elif _tags.get('name'):
-            alert.resource += '/{}'.format(_tags['name'])    
+            alert.resource += '/name={}'.format(_tags['name'])    
         
         elif _tags.get('job'):
-            alert.resource += '/{}'.format(_tags['job'])    
+            alert.resource += '/job={}'.format(_tags['job'])    
 
         elif _tags.get('deployment'):
-            alert.resource += '/{}'.format(_tags['deployment'])    
+            alert.resource += '/deploy={}'.format(_tags['deployment'])    
 
         return alert
 
