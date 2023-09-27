@@ -77,6 +77,9 @@ class MimirAlert(PluginBase):
         elif _tags.get('deployment'):
             alert.resource += '/deploy={}'.format(_tags['deployment'])    
 
+        elif _tags.get('group'):
+            alert.resource += '/{}'.format(_tags['group'])
+
         return alert
 
     def pre_receive(self, alert, **kwargs):
