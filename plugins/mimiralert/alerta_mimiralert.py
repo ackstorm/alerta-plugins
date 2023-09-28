@@ -6,7 +6,7 @@ from alerta.plugins import PluginBase
 from alerta.models.enums import Status
 
 LOG = logging.getLogger('alerta.plugins.mimiralert')
-TAGS_TO_ATTRIBUTES = ['timeperiod', 'env', 'cluster', 'tenant_id']
+TAGS_TO_ATTRIBUTES = ['timeperiod', 'env', 'cluster', 'peer_id']
 
 
 class MimirAlert(PluginBase):
@@ -25,8 +25,8 @@ class MimirAlert(PluginBase):
             except ValueError:
                 pass
 
-        # Exclude non multi-tenant events (not comming from mimir)
-        if not _tags.get('tenant_id'):
+        # Exclude non multi-peer events (not comming from mimir)
+        if not _tags.get('peer_id'):
             return alert    
 
         LOG.info("Processing mimir alert: %s", alert.id)         
@@ -47,8 +47,8 @@ class MimirAlert(PluginBase):
         alert.attributes['timeperiod'] = '24x7' if alert.environment == 'prod' else '8x5'
 
         # Set base propperties
-        alert.origin = 'prometheus/' + _tags['tenant_id']
-        alert.attributes['tenant_id'] = _tags['tenant_id'] # different heartbeats per tenant
+        alert.origin = 'prometheus/' + _tags['peer_id']
+        alert.attributes['peer_id'] = _tags['peer_id'] # different heartbeats per peer
 
         # Genrate unique descriptive resource
         alert.resource = '{}/{}/{}/{}'.format(
