@@ -1,6 +1,6 @@
 # alerta-plugins
 
-## * mimiralert
+## mimiralert
 
 parse alert comming from multi-tenant mimir alertmanager
 

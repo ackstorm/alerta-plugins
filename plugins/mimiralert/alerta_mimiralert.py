@@ -6,7 +6,7 @@ from alerta.plugins import PluginBase
 from alerta.models.enums import Status
 
 LOG = logging.getLogger('alerta.plugins.mimiralert')
-TAGS_TO_ATTRIBUTES = ['timeperiod', 'env', 'cluster', 'peer_id']
+TAGS_TO_ATTRIBUTES = ['timeperiod', 'env', 'cluster', 'peer_id', 'tenant_id']
 
 
 class MimirAlert(PluginBase):
