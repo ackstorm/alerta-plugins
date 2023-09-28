@@ -43,7 +43,7 @@ class MimirAlert(PluginBase):
 
         # Set environment and timeperiod
         alert.environment = _tags.get('env', current_app.config['DEFAULT_ENVIRONMENT'])
-        alert.environment = 'prod' if alert.environment in ['pro', 'prd'] else alert.environment # fix 3char envs
+        alert.environment = 'prod' if alert.environment in ['pro', 'prd'] else alert.environment # fix 3char paranoid envs
         alert.attributes['timeperiod'] = '24x7' if alert.environment == 'prod' else '8x5'
 
         # Set base propperties
