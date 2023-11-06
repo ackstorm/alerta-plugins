@@ -31,11 +31,10 @@ class MimirAlert(PluginBase):
 
         LOG.info("Processing mimir alert: %s", alert.id)         
 
-        # Hardcoded timeouts (11m for watchdog or 7m for alerts): repeat_interval: 2m configured in alertmanager
-        alert.timeout = 420 
+        # Hardcoded timeout
+        alert.timeout = 600
         if alert.event == 'Watchdog':
             alert.severity = 'critical'
-            alert.timeout = 600
 
         # Always define a service
         if not alert.service or not alert.service[0]:
