@@ -37,6 +37,10 @@ class MimirAlert(PluginBase):
             alert.severity = 'critical'
             alert.timeout = 600
 
+        # Exported namespace takes preference
+        if _tags.get('exported_namespace'):
+            _tags['namepsace'] = _tags['exported_namespace']
+
         # Always define a service
         if not alert.service or not alert.service[0]:
             alert.service = [_tags.get('namespace')] if _tags.get('namespace') else ['global']
@@ -61,22 +65,20 @@ class MimirAlert(PluginBase):
         # Enhance resource
         if alert.event == 'KubeHpaMaxedOut' and _tags.get('horizontalpodautoscaler'):
             alert.resource += '/hpa={}'.format(_tags['horizontalpodautoscaler'])
-
+        elif alert.event == 'BlackboxProbeFailed' and tags.get('ingress'):
+            alert.resource += '/{}'.format(_tags['ingress'])
+        elif _tags.get('deployment'):
+            alert.resource += '/deployment={}'.format(_tags['deployment'])
         elif _tags.get('container') and _tags.get('container') != "kube-rbac-proxy-main":
             alert.resource += '/container={}'.format(_tags['container'])
-
         elif _tags.get('app'):
             alert.resource += '/app={}'.format(_tags['app'])
-
         elif _tags.get('name'):
             alert.resource += '/name={}'.format(_tags['name'])    
-        
         elif _tags.get('job'):
             alert.resource += '/job={}'.format(_tags['job'])    
-
         elif _tags.get('deployment'):
             alert.resource += '/deploy={}'.format(_tags['deployment'])    
-
         elif _tags.get('group'):
             alert.resource += '/{}'.format(_tags['group'])
 
