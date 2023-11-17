@@ -68,6 +68,10 @@ class MimirAlert(PluginBase):
             alert.resource += '/{}'.format(_tags['ingress'])
         elif _tags.get('deployment'):
             alert.resource += '/deployment={}'.format(_tags['deployment'])
+        elif _tags.get('daemonset'):
+            alert.resource += '/daemonset={}'.format(_tags['daemonset'])
+        elif _tags.get('statefulset'):
+            alert.resource += '/statefulset={}'.format(_tags['statefulset'])
         elif _tags.get('container') and _tags.get('container') != "kube-rbac-proxy-main":
             alert.resource += '/container={}'.format(_tags['container'])
         elif _tags.get('app'):
