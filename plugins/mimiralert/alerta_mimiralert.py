@@ -14,19 +14,19 @@ class MimirAlert(PluginBase):
         super().__init__(name)
 
     def _parse_alert(self, alert):
-        # Tags to attributes and build _tags
-        _tags = {}
+        # Tags to attributes and build tags
+        tags = {}
         for item in alert.tags:
             try:
                 k, v = item.split('=', 1)
-                _tags[k] = v
+                tags[k] = v
                 if k in TAGS_TO_ATTRIBUTES and not alert.attributes.get(k):
                     alert.attributes[k] = v
             except ValueError:
                 pass
 
         # Exclude non multi-peer events (not comming from mimir)
-        if not _tags.get('peer_id'):
+        if not tags.get('peer_id'):
             return alert    
 
         LOG.info("Processing mimir alert: %s", alert.id)         
@@ -37,21 +37,21 @@ class MimirAlert(PluginBase):
             alert.severity = 'critical'
 
         # Exported namespace takes preference
-        if _tags.get('exported_namespace'):
-            _tags['namepsace'] = _tags['exported_namespace']
+        if tags.get('exported_namespace'):
+            tags['namepsace'] = tags['exported_namespace']
 
         # Always define a service
         if not alert.service or not alert.service[0]:
-            alert.service = [_tags.get('namespace')] if _tags.get('namespace') else ['global']
+            alert.service = [tags.get('namespace')] if tags.get('namespace') else ['global']
 
         # Set environment and timeperiod
-        alert.environment = _tags.get('env', current_app.config['DEFAULT_ENVIRONMENT'])
+        alert.environment = tags.get('env', current_app.config['DEFAULT_ENVIRONMENT'])
         alert.environment = 'prod' if alert.environment in ['pro', 'prd'] else alert.environment # fix 3char paranoid envs
         alert.attributes['timeperiod'] = '24x7' if alert.environment == 'prod' else '8x5'
 
         # Set base propperties
-        alert.origin = 'prometheus/' + _tags['peer_id']
-        alert.attributes['peer_id'] = _tags['peer_id'] # different heartbeats per peer
+        alert.origin = 'prometheus/' + tags['peer_id']
+        alert.attributes['peer_id'] = tags['peer_id'] # different heartbeats per peer
 
         # Genrate unique descriptive resource
         alert.resource = '{}/{}/{}/{}'.format(
@@ -62,28 +62,28 @@ class MimirAlert(PluginBase):
         )
 
         # Enhance resource
-        if alert.event == 'KubeHpaMaxedOut' and _tags.get('horizontalpodautoscaler'):
-            alert.resource += '/hpa={}'.format(_tags['horizontalpodautoscaler'])
+        if alert.event == 'KubeHpaMaxedOut' and tags.get('horizontalpodautoscaler'):
+            alert.resource += '/hpa={}'.format(tags['horizontalpodautoscaler'])
         elif alert.event == 'BlackboxProbeFailed' and tags.get('ingress'):
-            alert.resource += '/{}'.format(_tags['ingress'])
-        elif _tags.get('deployment'):
-            alert.resource += '/deployment={}'.format(_tags['deployment'])
-        elif _tags.get('daemonset'):
-            alert.resource += '/daemonset={}'.format(_tags['daemonset'])
-        elif _tags.get('statefulset'):
-            alert.resource += '/statefulset={}'.format(_tags['statefulset'])
-        elif _tags.get('container') and _tags.get('container') != "kube-rbac-proxy-main":
-            alert.resource += '/container={}'.format(_tags['container'])
-        elif _tags.get('app'):
-            alert.resource += '/app={}'.format(_tags['app'])
-        elif _tags.get('name'):
-            alert.resource += '/name={}'.format(_tags['name'])    
-        elif _tags.get('job'):
-            alert.resource += '/job={}'.format(_tags['job'])    
-        elif _tags.get('deployment'):
-            alert.resource += '/deploy={}'.format(_tags['deployment'])    
-        elif _tags.get('group'):
-            alert.resource += '/{}'.format(_tags['group'])
+            alert.resource += '/{}'.format(tags['ingress'])
+        elif tags.get('deployment'):
+            alert.resource += '/deployment={}'.format(tags['deployment'])
+        elif tags.get('daemonset'):
+            alert.resource += '/daemonset={}'.format(tags['daemonset'])
+        elif tags.get('statefulset'):
+            alert.resource += '/statefulset={}'.format(tags['statefulset'])
+        elif tags.get('container') and not tags.get('container').startswith("kube-rbac-proxy"):
+            alert.resource += '/container={}'.format(tags['container'])
+        elif tags.get('app'):
+            alert.resource += '/app={}'.format(tags['app'])
+        elif tags.get('name'):
+            alert.resource += '/name={}'.format(tags['name'])    
+        elif tags.get('job'):
+            alert.resource += '/job={}'.format(tags['job'])    
+        elif tags.get('deployment'):
+            alert.resource += '/deploy={}'.format(tags['deployment'])    
+        elif tags.get('group'):
+            alert.resource += '/{}'.format(tags['group'])
 
         return alert
 
