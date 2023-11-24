@@ -32,7 +32,7 @@ class MimirAlert(PluginBase):
         LOG.info("Processing mimir alert: %s", alert.id)         
 
         # Hardcoded timeout
-        alert.timeout = 1800
+        alert.timeout = 1800 # Alert timeout for non "send_resolved" from alertmanager
         if alert.event == 'Watchdog':
             alert.timeout = 900
             alert.severity = 'critical'
