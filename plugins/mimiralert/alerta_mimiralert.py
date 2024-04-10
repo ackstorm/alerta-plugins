@@ -39,7 +39,7 @@ class MimirAlert(PluginBase):
 
         # Exported namespace takes preference
         if tags.get('exported_namespace'):
-            tags['namepsace'] = tags['exported_namespace']
+            tags['namespace'] = tags['exported_namespace']
 
         # Always define a service
         if not alert.service or not alert.service[0]:
