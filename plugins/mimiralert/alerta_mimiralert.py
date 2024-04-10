@@ -29,7 +29,7 @@ class MimirAlert(PluginBase):
         if not tags.get('peer_id'):
             return alert    
 
-        LOG.info("Processing mimir alert: %s", alert.id)         
+        LOG.info("Processing mimir alert: %s", alert.id)
 
         # Hardcoded timeout
         alert.timeout = 1800 # Alert timeout for non "send_resolved" from alertmanager
@@ -48,7 +48,8 @@ class MimirAlert(PluginBase):
         # Set environment and timeperiod
         alert.environment = tags.get('env', current_app.config['DEFAULT_ENVIRONMENT'])
         alert.environment = 'prod' if alert.environment in ['pro', 'prd'] else alert.environment # fix 3char paranoid envs
-        alert.attributes['timeperiod'] = '24x7' if alert.environment == 'prod' else '8x5'
+        if not alert.attributes.get('timeperiod'):
+            alert.attributes['timeperiod'] = '24x7' if alert.environment == 'prod' else '12x5'
 
         # Set base propperties
         alert.origin = 'prometheus/' + tags['peer_id']
@@ -73,18 +74,18 @@ class MimirAlert(PluginBase):
             alert.resource += '/daemonset={}'.format(tags['daemonset'])
         elif tags.get('statefulset'):
             alert.resource += '/statefulset={}'.format(tags['statefulset'])
-        elif tags.get('container') and not tags.get('container').startswith("kube-rbac-proxy"):
-            alert.resource += '/container={}'.format(tags['container'])
         elif tags.get('app'):
             alert.resource += '/app={}'.format(tags['app'])
         elif tags.get('name'):
             alert.resource += '/name={}'.format(tags['name'])    
         elif tags.get('job'):
             alert.resource += '/job={}'.format(tags['job'])    
-        elif tags.get('deployment'):
-            alert.resource += '/deploy={}'.format(tags['deployment'])    
+        elif tags.get('job_name'):
+            alert.resource += '/job={}'.format(tags['job_name'])    
         elif tags.get('group'):
             alert.resource += '/{}'.format(tags['group'])
+        elif tags.get('container') and not tags.get('container').startswith("kube-rbac-proxy"):
+            alert.resource += '/container={}'.format(tags['container'])
 
         return alert
 
