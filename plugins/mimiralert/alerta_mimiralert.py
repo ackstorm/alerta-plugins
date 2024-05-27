@@ -94,8 +94,13 @@ class MimirAlert(PluginBase):
             alert = self._parse_alert(alert)
         return alert
 
-    def post_receive(self, alert):
+    def post_receive(self, alert, **kwargs):
         return
 
-    def status_change(self, alert, status, text):
-        return
+    def status_change(self, alert, status, text, **kwargs):
+        if not alert:
+            LOG.info("recieved invalid alert %s", alert)
+            return
+        if status == Status.Expired:
+            alert.status = Status.closed
+        return alert
