@@ -3,7 +3,7 @@ import logging
 
 from flask import current_app
 from alerta.plugins import PluginBase
-from alerta.models.enums import Status
+from alerta.models.enums import Status, Severity
 
 LOG = logging.getLogger('alerta.plugins.mimiralert')
 TAGS_TO_ATTRIBUTES = ['timeperiod', 'env', 'cluster', 'peer_id', 'tenant_id']
@@ -103,5 +103,8 @@ class MimirAlert(PluginBase):
             return
         if status == Status.Expired:
             LOG.info("Expired alert to close %s", alert)
+            alert.status = Status.Closed
+        elif severity == Severity.Normal:
+            LOG.info("Severity Normal alert to close %s", alert)
             alert.status = Status.Closed
         return alert
