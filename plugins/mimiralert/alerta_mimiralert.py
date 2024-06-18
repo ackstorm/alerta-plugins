@@ -101,7 +101,7 @@ class MimirAlert(PluginBase):
         if not alert:
             LOG.info("recieved invalid alert %s", alert)
             return
-        if status == Status.Expired:
+        if alert.status == Status.Expired:
             LOG.info("Expired alert to close %s", alert)
             alert.status = Status.Closed
         elif severity == Severity.Normal:
