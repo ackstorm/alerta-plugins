@@ -101,9 +101,10 @@ class MimirAlert(PluginBase):
         if not alert:
             LOG.info("recieved invalid alert %s", alert)
             return
-        if alert.event_type != "prometheusAlert":
-            return alert
-        if alert.status == Status.Expired or alert.severity == Severity.Normal:
+        if status == Status.Expired:
             LOG.info("Expired alert to close %s", alert)
+            alert.status = Status.Closed
+        elif alert.severity == Severity.Normal:
+            LOG.info("Severity Normal alert to close %s", alert)
             alert.status = Status.Closed
         return alert
