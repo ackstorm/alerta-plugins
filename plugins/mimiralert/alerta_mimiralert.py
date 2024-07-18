@@ -97,7 +97,7 @@ class MimirAlert(PluginBase):
     def post_receive(self, alert, **kwargs):
         return
 
-    def status_change(self, alert, **kwargs):
+    def status_change(self, alert, status, text, **kwargs):
         if not alert:
             LOG.info("recieved invalid alert %s", alert)
             return
