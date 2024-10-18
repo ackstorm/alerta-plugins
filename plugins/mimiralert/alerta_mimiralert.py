@@ -64,7 +64,8 @@ class MimirAlert(PluginBase):
         if alert.event == 'Watchdog':
             # Add service to heartbeat (loki and prometheus)
             if alert.service and alert.service[0]:
-                alert.origin = f"{alert.origin}/{alert.service[0]}"
+                service = alert.service[0] if alert.service[0] != "prometheus" else "mimir"
+                alert.origin = f"{alert.origin}/{service}"
             alert.timeout = 900
             alert.severity = 'critical'
 
@@ -104,7 +105,7 @@ class MimirAlert(PluginBase):
 
     def status_change(self, alert: Alert, status: Status, text: str, **kwargs: Any) -> Alert:
         if not alert:
-            LOG.info("received invalid alert %s", alert)
+            LOG.info("Received invalid alert %s", alert)
             return alert
         if status == Status.Expired or alert.severity == Severity.Normal:
             LOG.info("%s alert to close %s", status, alert)
