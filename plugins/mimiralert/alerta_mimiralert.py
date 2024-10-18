@@ -1,8 +1,10 @@
 import os
 import logging
+from typing import Dict, Any
 
 from flask import current_app
 from alerta.plugins import PluginBase
+from alerta.models.alert import Alert
 from alerta.models.enums import Status, Severity
 
 LOG = logging.getLogger('alerta.plugins.mimiralert')
@@ -13,7 +15,7 @@ class MimirAlert(PluginBase):
     def __init__(self, name=None):
         super().__init__(name)
 
-    def _parse_alert(self, alert):
+    def _parse_alert(self, alert: Alert) -> Alert:
         # Tags to attributes and build tags
         tags = {}
         for item in alert.tags:
@@ -92,22 +94,19 @@ class MimirAlert(PluginBase):
 
         return alert
 
-    def pre_receive(self, alert, **kwargs):
+    def pre_receive(self, alert: Alert, **kwargs: Any) -> Alert:
         if alert.event_type == "prometheusAlert":
             alert = self._parse_alert(alert)
         return alert
 
-    def post_receive(self, alert, **kwargs):
-        return
+    def post_receive(self, alert: Alert, **kwargs: Any) -> None:
+        pass
 
-    def status_change(self, alert, status, text, **kwargs):
+    def status_change(self, alert: Alert, status: Status, text: str, **kwargs: Any) -> Alert:
         if not alert:
-            LOG.info("recieved invalid alert %s", alert)
-            return
-        if status == Status.Expired:
-            LOG.info("Expired alert to close %s", alert)
-            alert.status = Status.Closed
-        elif alert.severity == Severity.Normal:
-            LOG.info("Severity Normal alert to close %s", alert)
+            LOG.info("received invalid alert %s", alert)
+            return alert
+        if status == Status.Expired or alert.severity == Severity.Normal:
+            LOG.info("%s alert to close %s", status, alert)
             alert.status = Status.Closed
         return alert
