@@ -31,12 +31,6 @@ class MimirAlert(PluginBase):
 
         LOG.info("Processing mimir alert: %s", alert.id)
 
-        # Hardcoded timeout
-        alert.timeout = 1800 # Alert timeout for non "send_resolved" from alertmanager
-        if alert.event == 'Watchdog':
-            alert.timeout = 900
-            alert.severity = 'critical'
-
         # Exported namespace takes preference
         if tags.get('exported_namespace'):
             tags['namespace'] = tags['exported_namespace']
@@ -62,6 +56,15 @@ class MimirAlert(PluginBase):
             alert.event,
             alert.service[0]
         )
+
+        # Hardcoded timeout
+        alert.timeout = 1800 # Alert timeout for non "send_resolved" from alertmanager
+        if alert.event == 'Watchdog':
+            # Add service to heartbeat (loki and prometheus)
+            if alert.service and alert.service[0]:
+                alert.tags.append(f"service={alert.service[0]}") 
+            alert.timeout = 900
+            alert.severity = 'critical'
 
         # Enhance resource
         if alert.event == 'KubeHpaMaxedOut' and tags.get('horizontalpodautoscaler'):
