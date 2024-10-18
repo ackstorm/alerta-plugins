@@ -107,7 +107,7 @@ class MimirAlert(PluginBase):
         if status == Status.Expired:
             LOG.info("Expired alert to close %s", alert)
             alert.status = Status.Closed
-        elif severity == Severity.Normal:
+        elif alert.severity == Severity.Normal:
             LOG.info("Severity Normal alert to close %s", alert)
             alert.status = Status.Closed
         return alert
