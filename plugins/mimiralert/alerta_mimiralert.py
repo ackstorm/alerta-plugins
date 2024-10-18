@@ -62,7 +62,7 @@ class MimirAlert(PluginBase):
         if alert.event == 'Watchdog':
             # Add service to heartbeat (loki and prometheus)
             if alert.service and alert.service[0]:
-                alert.origin = 'prometheus/' + tags['peer_id'] + "/" + alert.service[0]
+                alert.origin = f"{alert.origin}/{alert.service[0]}"
             alert.timeout = 900
             alert.severity = 'critical'
 
