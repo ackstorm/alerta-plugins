@@ -45,7 +45,7 @@ class MimirAlert(PluginBase):
         alert.environment = tags.get('env', current_app.config['DEFAULT_ENVIRONMENT'])
         alert.environment = 'prod' if alert.environment in ['pro', 'prd'] else alert.environment # fix 3char paranoid envs
         if not alert.attributes.get('timeperiod'):
-            alert.attributes['timeperiod'] = '24x7' if alert.environment == 'prod' else '12x5'
+            alert.attributes['timeperiod'] = '24x7' if alert.environment == 'prod' else 'workhours'
 
         # Set base propperties
         alert.origin = 'prometheus/' + tags['peer_id']
